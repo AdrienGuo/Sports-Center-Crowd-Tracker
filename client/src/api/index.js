@@ -64,11 +64,11 @@ export const fetchCountries = async () => {
 
 export const fetchDBData = async () => {
   try {
-    const { data } = await axios.get("http://localhost:81/testDB/get/gym");
-    return data.slice(-20).map(({ time, gym_people, swim_people }) => ({
+    const { data } = await axios.get("http://localhost:81/database/get/gym");
+    return data.slice(-20).map(({ time, gym, swim }) => ({
       time,
-      gym: gym_people,
-      swim: swim_people,
+      gym,
+      swim,
     }));
   } catch (error) {
     return error;

@@ -4,11 +4,11 @@ var cors = require("cors");
 var app = express();
 
 var testAPIRouter = require("./routes/testAPI");
-var testDBRouter = require("./routes/testDB");
+var databaseRouter = require("./routes/database");
 
 app.use(cors());
 app.use("/testAPI", testAPIRouter);
-app.use("/testDB", testDBRouter);
+app.use("/database", databaseRouter);
 
 // Constants
 const PORT = 8080;

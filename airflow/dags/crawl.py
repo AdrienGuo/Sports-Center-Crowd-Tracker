@@ -4,6 +4,7 @@ import requests
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
+from sports_center import SportsCenterTimetable
 
 from airflow import DAG
 
@@ -14,10 +15,6 @@ default_args = {
 }
 
 API = "https://zlcsc.cyc.org.tw/api"
-
-
-def greet():
-    print("Hello World!")
 
 
 def crawl_center_people(ti):
@@ -38,11 +35,12 @@ def crawl_center_people(ti):
 
 with DAG(
     default_args=default_args,
-    dag_id="crawl",
-    description="my first dag",
+    dag_id="crawl_custom_timetable",
+    description="Crawl data from sports center with custom timetable",
     start_date=days_ago(0),
-    schedule_interval="*/10 * * * *",  # https://crontab.guru/every-10-minutes
-    catchup=False
+    timetable=SportsCenterTimetable(),
+    catchup=False,
+    tags=["sports_center", "timetable"],
 ) as dag:
     crawl_center_people_task = PythonOperator(
         task_id="crawl_center_people",
@@ -54,8 +52,8 @@ with DAG(
         sql="""
             create table if not exists people (
                 time timestamp PRIMARY KEY,
-                gym_people int NOT NULL,
-                swim_people int NOT NULL
+                gym int NOT NULL,
+                swim int NOT NULL
             )
         """
     )
@@ -63,8 +61,8 @@ with DAG(
         task_id="insert_into_table",
         postgres_conn_id="postgres_localhost",
         sql="""
-            insert into people (time, gym_people, swim_people)
-            values ('{{ ts }}', '{{ ti.xcom_pull(task_ids="crawl_center_people", key="gym_people_num") }}', '{{ ti.xcom_pull(task_ids="crawl_center_people", key="swim_people_num") }}');
+            insert into people (time, gym, swim)
+            values ('{{ data_interval_end }}', '{{ ti.xcom_pull(task_ids="crawl_center_people", key="gym_people_num") }}', '{{ ti.xcom_pull(task_ids="crawl_center_people", key="swim_people_num") }}');
         """
     )
 
