@@ -1,6 +1,6 @@
 # 中壢國民運動中心人流追蹤
 
-![](https://i.imgur.com/Iqiungh.png)
+![](https://i.imgur.com/0V8ku9w.png)
 
 - 將運動中心的場館人數以圖形化來顯示
 - 以 Airflow 來管理資料抓取的工作

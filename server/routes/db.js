@@ -1,10 +1,10 @@
 const Pool = require("pg").Pool;
 
 const pool = new Pool({
-  user: "airflow",
   host: "sports-center-crowd-tracker-postgres-1",
-  database: "sports_center",
+  user: "airflow",
   password: "airflow",
+  database: "sports_center",
 });
 
 module.exports = pool;

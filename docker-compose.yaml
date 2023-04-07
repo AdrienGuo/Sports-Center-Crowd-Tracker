@@ -245,5 +245,15 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  model:
+    container_name: model
+    build: ./model
+    image: webapp/model
+    volumes:
+      - ./model:/workspace/gru
+    stdin_open: true
+    tty: true
+
+
 volumes:
   postgres-db-volume:
