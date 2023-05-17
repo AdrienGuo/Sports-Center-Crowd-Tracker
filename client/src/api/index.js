@@ -74,3 +74,39 @@ export const fetchDBData = async () => {
     return error;
   }
 };
+
+export const fetchPredictCenterCrowd = async (centerCrowd) => {
+  console.log(centerCrowd);
+  try {
+    let { data } = await axios.post(
+      "http://localhost:8000/predict",
+      centerCrowd,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// export const fetchPredictCenterCrowd = async (centerCrowd) => {
+//   try {
+//     let { data } = await axios.get("http://localhost:8000/predictOld");
+//     return data;
+//   } catch (error) {
+//     return error;
+//   }
+// };
+
+// export const fetchPredictCenterCrowd = async (centerCrowd) => {
+//   try {
+//     let { data } = await axios.get("http://localhost:8000");
+//     return data;
+//   } catch (error) {
+//     return error;
+//   }
+// };

@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "chart.js";
 
-import { fetchDBData } from "../../api";
+import { fetchDBData, fetchPredictCenterCrowd } from "../../api";
 import styles from "./Chart.module.css";
 
 ChartJS.register(
@@ -27,16 +27,26 @@ ChartJS.register(
 );
 
 const App = ({ data: { confirmed, recovered, deaths }, country }) => {
-  const [dailyData, setDailyData] = useState({});
+  const [centerCrowd, setCenterCrowd] = useState([]);
+  const [predictCenterCrowd, setPredictCenterCrowd] = useState([]);
 
   useEffect(() => {
     const fetchDBAPI = async () => {
       const initialDBData = await fetchDBData();
-      setDailyData(initialDBData);
+      setCenterCrowd(initialDBData);
     };
-
     fetchDBAPI();
   }, []);
+
+  useEffect(() => {
+    const fetchPredictCenterCrowdAPI = async () => {
+      const data = await fetchPredictCenterCrowd(centerCrowd);
+      setPredictCenterCrowd(data);
+    };
+    fetchPredictCenterCrowdAPI();
+  }, [centerCrowd]);
+
+  let combinedCenterCrowd = [...centerCrowd, ...predictCenterCrowd];
 
   const barChart = confirmed ? (
     <Bar
@@ -61,21 +71,25 @@ const App = ({ data: { confirmed, recovered, deaths }, country }) => {
     />
   ) : null;
 
-  console.log(dailyData);
-  const lineChart = dailyData[0] ? (
+  console.log(centerCrowd);
+  console.log(predictCenterCrowd);
+  console.log(combinedCenterCrowd);
+  const lineChart = combinedCenterCrowd[0] ? (
     <Line
       data={{
-        labels: dailyData.map(({ time }) => moment(time).format("kk:mm")),
+        labels: combinedCenterCrowd.map(({ time }) =>
+          moment(time).format("kk:mm")
+        ),
         datasets: [
           {
-            data: dailyData.map((data) => data.gym),
+            data: combinedCenterCrowd.map((data) => data.gym),
             label: "健身房",
             borderColor: "red",
             backgroundColor: "rgba(255, 0, 0, 0.5)",
             fill: false,
           },
           {
-            data: dailyData.map((data) => data.swim),
+            data: combinedCenterCrowd.map((data) => data.swim),
             label: "游泳池",
             borderColor: "#3333ff",
             fill: false,

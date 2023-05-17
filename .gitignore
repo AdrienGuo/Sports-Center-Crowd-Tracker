@@ -1,5 +1,9 @@
+# Directories
 airflow/logs
 node_modules
 __pycache__
 
+
+# Files
 .DS_Store
+*.pth

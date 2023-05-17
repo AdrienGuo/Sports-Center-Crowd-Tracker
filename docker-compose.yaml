@@ -251,8 +251,25 @@ services:
     image: webapp/model
     volumes:
       - ./model:/workspace/gru
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
     stdin_open: true
     tty: true
+
+  flask:
+    container_name: flask
+    build: ./flask
+    image: webapp/flask
+    volumes:
+      - ./flask:/app
+    ports:
+      - 8000:8000
+    # depends_on:
+    #   <<: *airflow-common-depends-on
+    #   airflow-init:
+    #     condition: service_completed_successfully
 
 
 volumes:
