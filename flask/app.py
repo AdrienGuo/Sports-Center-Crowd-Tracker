@@ -1,11 +1,11 @@
 import json
 import sys
 
+import pendulum
 import torch
+from flask_cors import CORS
 
 from flask import Flask, jsonify, request
-
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
@@ -51,21 +51,27 @@ def predict():
         eprint(preds)
     elif request.method == "POST":
         eprint("Received POST method")
-        data = request.json
-        if data:
-            data = list(map(lambda elem: [elem['gym'], elem['swim']], data))
+        requests = request.json
+        if requests:
+            time = list(map(lambda elem: elem['time'], requests))
+            data = list(map(lambda elem: [elem['gym'], elem['swim']], requests))
 
-            preds = list()
+            last_time = pendulum.parse(time[-1])
+            duration = last_time.diff(pendulum.parse(time[-2]))
+
             model = torch.load('./gru.pth')
             model.eval()
             h = model.init_hidden()
-            pred, _ = model(data, h)
-            pred = pred[0].tolist()
-            preds.append({
-                'time': "2023-05-16T06:10:00.000Z",
-                'gym': pred[0],
-                'swim': pred[1],
-            })
+            preds, _ = model(data, h)
+            preds = preds.tolist()
+            for i, pred in enumerate(preds):
+                curr_time = last_time.add(minutes=duration.in_minutes())
+                preds[i] = {
+                    'time': str(curr_time),
+                    'gym': pred[0],
+                    'swim': pred[1]
+                }
+                last_time = curr_time
         else:
             preds = [{
                 'time': "2023-05-16T06:10:00.000Z",

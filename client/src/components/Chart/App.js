@@ -74,6 +74,9 @@ const App = ({ data: { confirmed, recovered, deaths }, country }) => {
   console.log(centerCrowd);
   console.log(predictCenterCrowd);
   console.log(combinedCenterCrowd);
+
+  const dash = (ctx, value) => (ctx.p0DataIndex >= 20 - 1 ? value : undefined);
+
   const lineChart = combinedCenterCrowd[0] ? (
     <Line
       data={{
@@ -82,17 +85,26 @@ const App = ({ data: { confirmed, recovered, deaths }, country }) => {
         ),
         datasets: [
           {
-            data: combinedCenterCrowd.map((data) => data.gym),
             label: "健身房",
+            data: combinedCenterCrowd.map((data) => data.gym),
             borderColor: "red",
+            segment: {
+              borderDash: (ctx) => dash(ctx, [5, 6]),
+            },
+            spanGaps: true,
             backgroundColor: "rgba(255, 0, 0, 0.5)",
             fill: false,
+            tension: 0.1,
           },
           {
-            data: combinedCenterCrowd.map((data) => data.swim),
             label: "游泳池",
+            data: combinedCenterCrowd.map((data) => data.swim),
             borderColor: "#3333ff",
+            segment: {
+              borderDash: (ctx) => dash(ctx, [5, 6]),
+            },
             fill: false,
+            tension: 0.1,
           },
         ],
       }}
